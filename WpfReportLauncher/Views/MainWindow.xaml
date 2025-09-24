@@ -1,0 +1,146 @@
+﻿<Window x:Class="WpfReportLauncher.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:WpfReportLauncher.ViewModels"
+        mc:Ignorable="d"
+        Background="LightGray"
+        Title="Excel/帳票 自動化ランチャー" Height="420" Width="680"
+        Closing="Window_Closing">
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- 説明文 -->
+            <RowDefinition Height="Auto"/>
+            <!-- ボタン -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <!-- ステータスバー -->
+        </Grid.RowDefinitions>
+
+        <!-- 上の説明文（0行目） -->
+        <TextBlock Grid.Row="0"
+                   Text="表項目に関する売上レポート(Excel)と請求書(PDF)を生成します。表項目に商品を追加することも可能です。"
+                   FontSize="14"/>
+
+        <!-- ボタン群（1行目） -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Margin="0,8,0,0">
+            <Button Content="売上レポート（Excel）生成"
+                    Padding="12,8"
+                    Margin="0,0,10,5"
+                    Background="blue"
+                    Foreground="White"
+                    Command="{Binding GenerateSalesReportCommand}" />
+            <Button Content="請求書（PDF）生成"
+                    Padding="12,8"
+                    Margin="0,0,10,5"
+                    Background="Blue"
+                    Foreground="White"
+                    Command="{Binding GenerateInvoicePdfCommand}" />
+            <Button Content="出力フォルダを開く"
+                    Padding="12,8"
+                    Margin="0,0,10,5" 
+                    Background="Blue"
+                    Foreground="White"
+                    Command="{Binding OpenOutputFolderCommand}" />
+            <Button Content="設定"
+                    Padding="12,8"
+                    Margin="0,0,10,5" 
+                    Background="Blue"
+                    Foreground="White"
+                    Command="{Binding OpenSettingCommand}"/>
+        </StackPanel>
+
+        <!-- ステータスバー（2行目） -->
+        <StatusBar Grid.Row="2">
+            <StatusBarItem Background="Black">
+                <TextBlock Text="{Binding Status}" Foreground="White" FontSize="20"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- ▼ 商品追加パネル（Grid.Row=3） -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,8,0,0" VerticalAlignment="Center">
+            <!-- 名前：ComboBox（productsのname） -->
+            <TextBlock Text="商品名：" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <ComboBox Width="200"
+                      ItemsSource="{Binding Products}"
+                      SelectedItem="{Binding SelectedProduct}"
+                      DisplayMemberPath="Name"
+                      Margin="0,0,16,0"/>
+
+            <!-- 値段：選択に応じて price を表示 -->
+            <TextBlock Text="値段(円)：" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <TextBlock VerticalAlignment="Center"
+                       Text="{Binding DisplayPrice, StringFormat='N0'}"
+                       Width="80"
+                       Margin="0,0,16,0"/>
+
+            <!-- 数量：- / 値 / + （初期1、0以下NG） -->
+            <TextBlock Text="数量：" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <Button Content="－" Padding="8,0" Margin="0,0,4,0"
+                    Command="{Binding DecreaseQuantityCommand}"/>
+            <TextBlock Width="36" TextAlignment="Center" VerticalAlignment="Center"
+                       Text="{Binding Quantity}" />
+            <Button Content="＋" Padding="8,0" Margin="4,0,16,0"
+                    Command="{Binding IncreaseQuantityCommand}"/>
+
+            <!-- 追加ボタン：DataGridに行を追加 -->
+            <Button Content="追加" Padding="12,8"
+                    Command="{Binding AddProductCommand}"/>
+        </StackPanel>
+        <!-- ▲ 商品追加パネル -->
+
+        <DataGrid Grid.Row="4"
+                  Name="SalesDataGrid"
+                  ItemsSource="{Binding SampleSales}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  IsReadOnly="True"
+                  HeadersVisibility="Column"
+                  Margin="0,8,0,0"
+                  Background="White"
+                  GridLinesVisibility="All"
+                  AlternatingRowBackground="LightGray"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick">
+            <DataGrid.Resources>
+                <!-- 数値列を右寄せにするための簡易スタイル -->
+                <Style x:Key="RightCell" TargetType="TextBlock">
+                    <Setter Property="TextAlignment" Value="Right"/>
+                    <Setter Property="Padding" Value="4,0,4,0"/>
+                </Style>
+            </DataGrid.Resources>
+
+            <DataGrid.Columns>
+                <!-- 日付：yyyy/MM/dd -->
+                <DataGridTextColumn Header="日付" Width="110">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Date" StringFormat="yyyy/MM/dd"/>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+
+                <!-- 商品名：可変幅 -->
+                <DataGridTextColumn Header="商品" Width="*"
+                                    Binding="{Binding Product}"/>
+
+                <!-- 数量：右寄せ -->
+                <DataGridTextColumn Header="数量" Width="90"
+                                    ElementStyle="{StaticResource RightCell}"
+                                    Binding="{Binding Quantity}"/>
+
+                <!-- 単価：3桁区切り -->
+                <DataGridTextColumn Header="単価" Width="120"
+                                    ElementStyle="{StaticResource RightCell}">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="UnitPrice" StringFormat="N0"/>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

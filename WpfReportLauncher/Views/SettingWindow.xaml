@@ -1,0 +1,62 @@
+﻿<Window x:Class="WpfReportLauncher.Views.SettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfReportLauncher.Views"
+        mc:Ignorable="d"
+        Background="LightGray"
+        Title="設定" Height="450" Width="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <!-- 会社名 -->
+        <StackPanel Grid.Row="0" Margin="20">
+            <Label Content="会社名" FontSize="20"/>
+            <TextBox Text="{Binding CompanyName, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,5" FontSize="20"/>
+        </StackPanel>
+
+        <!-- 部署名 -->
+        <StackPanel Grid.Row="1" Margin="20">
+            <Label Content="部署名" FontSize="20"/>
+            <TextBox Text="{Binding IssuerName, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,5" FontSize="20"/>
+        </StackPanel>
+
+        <!-- 税率 -->
+        <StackPanel Grid.Row="2" Margin="20">
+            <Label Content="税率 (%)" FontSize="20"/>
+            <TextBox Text="{Binding TaxRateText, UpdateSourceTrigger=PropertyChanged}"
+         Margin="0,5" FontSize="20"
+         MaxLength="3"
+         InputScope="Number"
+         PreviewTextInput="TaxRateTextBox_PreviewTextInput"/>
+        </StackPanel>
+
+        <!-- ボタン -->
+        <StackPanel Grid.Row="3" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Margin="20">
+            <Button Content="保存" 
+                    Command="{Binding SaveCommand}"
+                    Background="Blue"
+                    Foreground="White"
+                    Width="80" 
+                    Height="30" 
+                    Margin="5"/>
+            <Button Content="キャンセル" 
+                    Command="{Binding CancelCommand}"
+                    Background="Blue"
+                    Foreground="White"
+                    Width="80" 
+                    Height="30" 
+                    Margin="5"/>
+        </StackPanel>
+    </Grid>
+</Window>
